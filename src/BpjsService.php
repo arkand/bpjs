@@ -53,7 +53,9 @@ class BpjsService{
     public function __construct($configurations)
     {
         $this->clients = new Client([
-            'verify' => false
+            'verify' => false,
+            // 'curl' => [CURLOPT_SSLVERSION => CURL_SSLVERSION_DEFAULT],
+            // 'curl' => [CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1]
         ]);
 
         foreach ($configurations as $key => $val){
@@ -78,8 +80,8 @@ class BpjsService{
 
     protected function setTimestamp()
     {
-        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->timestamp = (string)$dateTime->getTimestamp();
+        date_default_timezone_set('UTC');
+        $this->timestamp = strval(time() - strtotime('1970-01-01 00:00:00'));
         return $this;
     }
 
@@ -100,7 +102,8 @@ class BpjsService{
                 'GET',
                 $this->base_url . '/' . $this->service_name . '/' . $feature,
                 [
-                    'headers' => $this->headers
+                    'headers' => $this->headers,
+                    // 'debug' => true
                 ]
             )->getBody()->getContents();
         } catch (\Exception $e) {
@@ -147,7 +150,24 @@ class BpjsService{
         }
         return $response;
     }
-
+    
+    protected function update($feature, $data = [])
+    {
+        $this->headers['Content-Type'] = 'application/json';
+        try {
+            $response = $this->clients->request(
+                'POST',
+                $this->base_url . '/' . $this->service_name . '/' . $feature,
+                [
+                    'headers' => $this->headers,
+                    'json' => $data,
+                ]
+            )->getBody()->getContents();
+        } catch (\Exception $e) {
+            $response = $e->getResponse()->getBody();
+        }
+        return $response;
+    }
 
     protected function delete($feature, $data = [])
     {
@@ -155,6 +175,24 @@ class BpjsService{
         try {
             $response = $this->clients->request(
                 'DELETE',
+                $this->base_url . '/' . $this->service_name . '/' . $feature,
+                [
+                    'headers' => $this->headers,
+                    'json' => $data,
+                ]
+            )->getBody()->getContents();
+        } catch (\Exception $e) {
+            $response = $e->getResponse()->getBody();
+        }
+        return $response;
+    }
+    //Applicares
+    protected function deleteAp($feature, $data = [])
+    {
+        $this->headers['Content-Type'] = 'application/json';
+        try {
+            $response = $this->clients->request(
+                'POST',
                 $this->base_url . '/' . $this->service_name . '/' . $feature,
                 [
                     'headers' => $this->headers,

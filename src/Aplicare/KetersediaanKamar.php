@@ -8,7 +8,7 @@ class KetersediaanKamar extends BpjsService
 
     public function refKelas()
     {
-        $response = $this->get('ref/kelas');
+        $response = $this->get('rest/ref/kelas');
         return json_decode($response, true);
     }
     public function bedGet($kodePpk, $start, $limit)
@@ -18,18 +18,18 @@ class KetersediaanKamar extends BpjsService
     }
     public function bedCreate($kodePpk, $data = [])
     {
-        $header = 'application/json';
-        $response = $this->post('bed/create/'.$kodePpk, $data, $header);
+        $header = ['Content-Type' => 'application/json'];
+        $response = $this->post('rest/bed/create/'.$kodePpk, $data, $header);
         return json_decode($response, true);
     }
     public function bedUpdate($kodePpk, $data = [])
     {
-        $response = $this->put('bed/update/'.$kodePpk, $data);
+        $response = $this->update('rest/bed/update/'.$kodePpk, $data);
         return json_decode($response, true);
     }
     public function bedDelete($kodePpk, $data = [])
     {
-        $response = $this->delete('bed/delete/'.$kodePpk, $data);
+        $response = $this->deleteAp('rest/bed/delete/'.$kodePpk, $data);
         return json_decode($response, true);
     }
 }
